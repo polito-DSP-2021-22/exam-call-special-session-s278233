@@ -76,6 +76,8 @@ class ClientTest {
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
 		Converter.stop();
+		System.gc();
+		emptyOutputDir();
 	}
 
 	@BeforeEach
@@ -84,8 +86,6 @@ class ClientTest {
 
 	@AfterEach
 	void tearDown() throws Exception {
-		System.gc();
-		emptyOutputDir();
 	}
 	
 	@Test
@@ -267,6 +267,8 @@ class ClientTest {
 		;
 		
 		assertTrue(dst.isFile());
+		System.gc();
+		dst.delete();
 	}
 
 	@Test
@@ -320,6 +322,8 @@ class ClientTest {
 		ConversionRequest.main(args);
 		File output = findFileForId("big", "png");
 		assertTrue(checkImageFormat(output, "png"));
+		System.gc();
+		output.delete();
 	}
 	
 	@Test
@@ -328,6 +332,8 @@ class ClientTest {
 		int clients = 50;
 		int i;
 		Thread[] clientArray = new Thread[clients];
+		
+		int filesInfolder = outputDir.listFiles().length;
 				
 		for(i=0;i<clients;i++) {
 			clientArray[i] = new Thread("Client Thread " + i) {
@@ -344,7 +350,7 @@ class ClientTest {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		assertTrue(outputDir.listFiles().length == clients);
+		assertTrue((outputDir.listFiles().length - filesInfolder) == clients);
 	}
 
 }
