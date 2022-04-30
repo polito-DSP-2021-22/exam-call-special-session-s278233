@@ -56,17 +56,20 @@ public class ConverterHandler implements Runnable {
 		success = "Received file";
 		errorChar = '1';
 		byte[] block = new byte[blockSize];
-		int bytesRead, payloadLength;
+		int bytesRead, bytesReadTotal, payloadLength;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		do {
 			payloadLength = inputSocketStream.readShort();
 			payloadLength &= 0xFFFF;
-			bytesRead = inputSocketStream.read(block, 0, payloadLength);
-			if (bytesRead == -1)
-				throw new IOException("Read error!");
-			else
-				baos.write(block, 0, payloadLength);
+			bytesReadTotal = 0;
+			while (bytesReadTotal < payloadLength) {
+				bytesRead = inputSocketStream.read(block, 0, payloadLength - bytesReadTotal);
+				if (bytesRead == -1)
+					throw new IOException("Read response error!");
+				baos.write(block, 0, bytesRead);
+				bytesReadTotal += bytesRead;
+			}
 		} while (payloadLength == blockSize);
 
 		socket.shutdownInput();
@@ -77,24 +80,28 @@ public class ConverterHandler implements Runnable {
 		error = "Conversion error!";
 		success = "Converted file";
 		errorChar = '1';
-		
+
 		String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(fileBuffer));
 		String fileType = contentType.split("/")[0];
 		String imageType = contentType.split("/")[1];
-		
-		if(!fileType.equals("image")) throw new IOException("Not an image!");
-		if(srcType.equals("jpg")) {
-			if(!imageType.equals(srcType) && !imageType.equals("jpeg")) throw new IOException("Format mismatch!");
-		}else if(!imageType.equals(srcType)) throw new IOException("Format mismatch!");
-		
+
+		if (!fileType.equals("image"))
+			throw new IOException("Not an image!");
+		if (srcType.equals("jpg")) {
+			if (!imageType.equals(srcType) && !imageType.equals("jpeg"))
+				throw new IOException("Format mismatch!");
+		} else if (!imageType.equals(srcType))
+			throw new IOException("Format mismatch!");
+
 		errorChar = '2';
-		
+
 		ByteArrayInputStream bais = new ByteArrayInputStream(fileBuffer);
-		BufferedImage loadedImage = ImageIO.read(bais);		
-		
-		BufferedImage bi = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage loadedImage = ImageIO.read(bais);
+
+		BufferedImage bi = new BufferedImage(loadedImage.getWidth(), loadedImage.getHeight(),
+				BufferedImage.TYPE_INT_RGB);
 		bi.getGraphics().drawImage(loadedImage, 0, 0, bi.getWidth(), bi.getHeight(), Color.WHITE, null);
-		
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(bi, dstType, baos);
 		return baos.toByteArray();
@@ -117,21 +124,22 @@ public class ConverterHandler implements Runnable {
 			i++;
 		}
 
-		if (size == blockSize) outputSocketStream.writeInt(0);
+		if (size == blockSize)
+			outputSocketStream.writeShort(0);
 		outputSocketStream.flush();
 	}
-	
+
 	public void closeConnection() throws IOException {
 		error = "Exit error!";
 		success = "Closing connection...";
 		socket.close();
 	}
-	
+
 	@Override
 	public void run() {
 		byte[] toSendBuffer = null;
 		byte[] receivedBuffer = null;
-		
+
 		Logger logger = Logger.getLogger(loggerName);
 
 		try {

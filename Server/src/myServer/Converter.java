@@ -39,8 +39,10 @@ public class Converter {
 				e.printStackTrace();
 			}
 		});
-		if(threadPool != null && !threadPool.isShutdown()) threadPool.shutdown();
-		if(serverSocket != null && !serverSocket.isClosed())serverSocket.close();
+		if (threadPool != null && !threadPool.isShutdown())
+			threadPool.shutdown();
+		if (serverSocket != null && !serverSocket.isClosed())
+			serverSocket.close();
 	}
 
 	public static void main(String[] args) {
@@ -56,13 +58,13 @@ public class Converter {
 				converter.start();
 				stop();
 			} catch (IOException e) {
-				if(!gracefulClose) {
-				System.err.println("Internal server error!");
-				e.printStackTrace();
-				if(converter != null) {
-					System.out.println("Closing server...");
-					Converter.stop();
-				}
+				if (!gracefulClose) {
+					System.err.println("Internal server error!");
+					e.printStackTrace();
+					if (converter != null) {
+						System.out.println("Closing server...");
+						Converter.stop();
+					}
 				} else {
 					System.out.println("Closing server...");
 					return;

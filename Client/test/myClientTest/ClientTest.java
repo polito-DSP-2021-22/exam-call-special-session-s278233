@@ -25,50 +25,71 @@ import myServer.Converter;
 class ClientTest {
 	private ConversionRequest test;
 	private static Thread thread;
-	private static File outputDir = new File(".\\ConvertedImages\\");
-	
+	private static String inputDirName = "." + File.separator + "ToConvertImages" + File.separator;
+	private static String outputDirName = "." + File.separator + "ConvertedImages" + File.separator;
+	private static File outputDir = new File(outputDirName);
+
 	public static File findFileForId(final String filePrefix, final String extension) {
-	    return outputDir.listFiles(new FileFilter() {
-	        public boolean accept(File pathname) {
-	            return pathname.getName().startsWith(filePrefix) && pathname.getName().endsWith(extension);    
-	            		}
-	    })[0];
+		File[] listFiles = outputDir.listFiles(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.getName().startsWith(filePrefix) && pathname.getName().endsWith(extension);
+			}
+		});
+		if (listFiles != null && listFiles.length != 0)
+			return listFiles[0];
+		else
+			return null;
 	}
-	
+
 	public static boolean checkImageFormat(File image, String format) {
 		ImageInputStream iis = null;
-		if(format.equals("jpg")) format = "jpeg";
+		if (format.equals("jpg"))
+			format = "jpeg";
 		try {
 			iis = ImageIO.createImageInputStream(image);
 			Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
 
 			while (imageReaders.hasNext()) {
-			    ImageReader reader = (ImageReader) imageReaders.next();
-			    if(reader.getFormatName().equalsIgnoreCase(format)) return true;
-			    else return false;
+				ImageReader reader = (ImageReader) imageReaders.next();
+				if (reader.getFormatName().equalsIgnoreCase(format))
+					return true;
+				else
+					return false;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return false;
 	};
-	
+
 	private static void emptyOutputDir() {
-		for(File f: outputDir.listFiles()) 
-			  f.delete(); 
+		for (File f : outputDir.listFiles())
+			f.delete();
+	}
+
+	class ClientThread extends Thread {
+		String[] args;
+
+		ClientThread(String[] args) {
+			this.args = args;
+		}
+
+		public void run() {
+			ConversionRequest.main(args);
+		}
 	}
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		   thread = new Thread("Server Thread") {
-			      public void run(){
-			  		Converter.main(null);
-			      }
-			   };
-			   
-			   thread.start();
-				System.gc();
-				emptyOutputDir();
+		thread = new Thread("Server Thread") {
+			public void run() {
+				Converter.main(null);
+			}
+		};
+
+		thread.start();
+		System.gc();
+		emptyOutputDir();
 	}
 
 	@AfterAll
@@ -85,12 +106,12 @@ class ClientTest {
 	@AfterEach
 	void tearDown() throws Exception {
 	}
-	
+
 	@Test
 	final void testWrongArguments() {
-        System.setSecurityManager(new ExitDeniedSecurityManager());
-		String args11[] = { "jpg", "perù.png" };
-		String args12[] = { "jpg", "png", "perù.jpg", "perù.png" };
+		System.setSecurityManager(new ExitDeniedSecurityManager());
+		String args11[] = { "jpg", "perÃ¹.png" };
+		String args12[] = { "jpg", "png", "perÃ¹.jpg", "perÃ¹.png" };
 		try {
 			ConversionRequest.main(args11);
 			fail("Expected exit");
@@ -106,10 +127,10 @@ class ClientTest {
 			assertEquals(1, status);
 		}
 
-		String args21[] = { "jp", "png", "perù.jpg" };
-		String args22[] = { "perù.jpg", "png", "perù.jpg" };
-		String args23[] = { "jpg", "pn", "perù.jpg" };
-		String args24[] = { "jpg", "perù.png", "perù.jpg" };
+		String args21[] = { "jp", "png", "perÃ¹.jpg" };
+		String args22[] = { "perÃ¹.jpg", "png", "perÃ¹.jpg" };
+		String args23[] = { "jpg", "pn", "perÃ¹.jpg" };
+		String args24[] = { "jpg", "perÃ¹.png", "perÃ¹.jpg" };
 		try {
 			ConversionRequest.main(args21);
 			fail("Expected exit");
@@ -139,8 +160,8 @@ class ClientTest {
 			assertEquals(2, status);
 		}
 
-		String args31[] = { "jpg", "tiff", "perù.jpg" };
-		String args32[] = { "bmp", "png", "perù.jpg" };
+		String args31[] = { "jpg", "tiff", "perÃ¹.jpg" };
+		String args32[] = { "bmp", "png", "perÃ¹.jpg" };
 		try {
 			ConversionRequest.main(args31);
 			fail("Expected exit");
@@ -158,7 +179,7 @@ class ClientTest {
 
 		String args41[] = { "jpg", "png", "" };
 		String args42[] = { "jpg", "png",
-				"C://Users/Utente/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/perù.jpg" };
+				"C://Users/Utente/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/Cartella1/Cartella2/perï¿½.jpg" };
 		try {
 			ConversionRequest.main(args41);
 			fail("Expected exit");
@@ -174,7 +195,7 @@ class ClientTest {
 			assertEquals(4, status);
 		}
 
-		String args51[] = { "jpg", "png", "../../perù.jpg" };
+		String args51[] = { "jpg", "png", ".." + File.separator + ".." + File.separator + "perÃ¹.jpg" };
 		try {
 			ConversionRequest.main(args51);
 			fail("Expected exit");
@@ -183,40 +204,28 @@ class ClientTest {
 			assertEquals(5, status);
 		}
 	}
-	
+
 	@Test
 	final void testConnection() {
 		try {
 			test = new ConversionRequest();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
-	
+
 	@Test
 	final void testMultipleConnections() {
-		int clients = 50;
-		int i;
-		Thread[] clientArray = new Thread[clients];
-		for(i=0;i<clients;i++) {
-			clientArray[i] = new Thread("Client Thread " + i) {
-			      public void run(){
-			    	  try {
-						new ConversionRequest();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				      }
-				   };
-				   clientArray[i].start();
-		}
-		
+		int i, clients = 50;
 		try {
+			for (i = 0; i < clients; i++)
+				new ConversionRequest();
 			Thread.sleep(40 * 100);
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		for(i=0;i<clients;i++) clientArray[i].interrupt();
 		assertTrue(true);
 	}
 
@@ -227,10 +236,10 @@ class ClientTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		File src = new File(".\\ToConvertImages\\", "perrù.jpg");
+		File src = new File(inputDirName, "perrÃ¹.jpg");
 		assertThrows(Exception.class, () -> test.readFile(src));
-		
-		File src2 = new File(".\\ToConvertImages\\", "perù.jpg");
+
+		File src2 = new File(inputDirName, "perÃ¹.jpg");
 		byte[] bytes = null;
 		try {
 			bytes = test.readFile(src2);
@@ -240,7 +249,7 @@ class ClientTest {
 		Assertions.assertNotEquals(new byte[0], bytes);
 		Assertions.assertNotNull(bytes);
 	}
-	
+
 	@Test
 	final void testWriteFile() {
 		try {
@@ -248,8 +257,8 @@ class ClientTest {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		File src = new File(".\\ToConvertImages\\", "perù.jpg");
-		File dst = new File(".\\ConvertedImages\\", "perù.jpg");
+		File src = new File(inputDirName, "perÃ¹.jpg");
+		File dst = new File(outputDirName, "perÃ¹.jpg");
 
 		assertThrows(Exception.class, () -> test.writeFile(null, null));
 
@@ -263,7 +272,7 @@ class ClientTest {
 			e.printStackTrace();
 		}
 		;
-		
+
 		assertTrue(dst.isFile());
 		System.gc();
 		dst.delete();
@@ -281,73 +290,42 @@ class ClientTest {
 
 	@Test
 	final void testMain() {
-		String args1[] = { "jpg", "png", "perù.jpg" };
-		String args2[] = { "png", "jpg", "tux.png" };
-		String args3[] = { "jpg", "gif", "perù.jpg" };
-		String args4[] = { "gif", "jpg", "micheal.gif" };
-		String args5[] = { "gif", "png", "micheal.gif" };
-		String args6[] = { "png", "gif", "tux.png" };
-				
-		ConversionRequest.main(args1);
-		File output1 = findFileForId("perù", "png");
-		assertTrue(checkImageFormat(output1, "png"));
-		
-		ConversionRequest.main(args2);
-		File output2 = findFileForId("tux", "jpg");
-		assertTrue(checkImageFormat(output2, "jpg"));
-		
-		ConversionRequest.main(args3);
-		File output3 = findFileForId("perù", "gif");
-		assertTrue(checkImageFormat(output3, "gif"));
-		
-		ConversionRequest.main(args4);
-		File output4 = findFileForId("micheal", "jpg");
-		assertTrue(checkImageFormat(output4, "jpg"));
-		
-		ConversionRequest.main(args5);
-		File output5 = findFileForId("micheal", "png");
-		assertTrue(checkImageFormat(output5, "png"));
-		
-		ConversionRequest.main(args6);
-		File output6 = findFileForId("tux", "gif");
-		assertTrue(checkImageFormat(output6, "gif"));
+		int clients = 6, i;
+		String[][] args = { { "jpg", "png", "perÃ¹.jpg" }, { "png", "jpg", "tux.png" }, { "jpg", "gif", "perÃ¹.jpg" },
+				{ "gif", "jpg", "micheal.gif" }, { "gif", "png", "micheal.gif" }, { "png", "gif", "tux.png" } };
+		String[][] parameters = { { "perÃ¹", "png" }, { "tux", "jpg" }, { "perÃ¹", "gif" }, { "micheal", "jpg" },
+				{ "micheal", "png" }, { "tux", "gif" } };
+		File outputs[] = new File[clients];
+		for (i = 0; i < clients; i++) {
+			ConversionRequest.main(args[i]);
+			outputs[i] = findFileForId(parameters[i][0], parameters[i][1]);
+			if (outputs[i] == null)
+				fail();
+			assertTrue(checkImageFormat(outputs[i], parameters[i][1]));
+		}
 	}
-	
+
 	@Test
 	final void testBigFile() {
 		String args[] = { "jpg", "png", "big.jpg" };
-				
+
 		ConversionRequest.main(args);
 		File output = findFileForId("big", "png");
 		assertTrue(checkImageFormat(output, "png"));
 		System.gc();
 		output.delete();
 	}
-	
+
 	@Test
 	final void testMultipleMain() {
-		String args[] = { "jpg", "png", "perù.jpg"};
-		int clients = 50;
-		int i;
-		Thread[] clientArray = new Thread[clients];
-		
+		String args[] = { "jpg", "png", "perÃ¹.jpg" };
+		int i, clients = 50;
+
 		int filesInfolder = outputDir.listFiles().length;
-				
-		for(i=0;i<clients;i++) {
-			clientArray[i] = new Thread("Client Thread " + i) {
-			      public void run(){
-			    	  ConversionRequest.main(args);
-				      }
-				   };
-				   clientArray[i].start();
-		}
-		
-		for(i=0;i<clients;i++)
-			try {
-				clientArray[i].join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+
+		for (i = 0; i < clients; i++)
+			ConversionRequest.main(args);
+
 		assertTrue((outputDir.listFiles().length - filesInfolder) == clients);
 	}
 

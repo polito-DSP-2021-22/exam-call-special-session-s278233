@@ -8,12 +8,11 @@ import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class ConversionRequest {
 	private final static String remoteHostname = null;
 	private final static int remotePort = 2001;
-	private final static String inFolder = ".\\ToConvertImages\\";
-	private final static String outFolder = ".\\ConvertedImages\\";
+	private final static String inFolder = "." + File.separator + "ToConvertImages" + File.separator;
+	private final static String outFolder = "." + File.separator + "ConvertedImages" + File.separator;
 	private final static String supportedTypes[] = { "gif", "jpg", "png" };
 	private final static int blockSize = 65535;
 	private final static int TIMEOUT = 30 * 1000;
@@ -60,13 +59,14 @@ public class ConversionRequest {
 			outputSocketStream.writeInt(0);
 
 		outputSocketStream.flush();
+		socket.shutdownOutput();
 	}
 
 	public byte[] receiveData() throws IOException {
 		error = "Connection error!";
 		success = "Received file converted";
 		byte[] block = new byte[blockSize];
-		int bytesRead, payloadLength;
+		int bytesRead, bytesReadTotal, payloadLength;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		char controlChar = (char) inputSocketStream.read();
@@ -74,11 +74,14 @@ public class ConversionRequest {
 		do {
 			payloadLength = inputSocketStream.readShort();
 			payloadLength &= 0xFFFF;
-			bytesRead = inputSocketStream.read(block, 0, payloadLength);
-			if (bytesRead == -1)
-				throw new IOException();
-			else
-				baos.write(block, 0, payloadLength);
+			bytesReadTotal = 0;
+			while (bytesReadTotal < payloadLength) {
+				bytesRead = inputSocketStream.read(block, 0, payloadLength - bytesReadTotal);
+				if (bytesRead == -1)
+					throw new IOException("Read response error!");
+				baos.write(block, 0, bytesRead);
+				bytesReadTotal += bytesRead;
+			}
 		} while (payloadLength == blockSize);
 
 		switch (controlChar) {
@@ -106,10 +109,16 @@ public class ConversionRequest {
 		os.close();
 	}
 
+	public void closeConnection() throws IOException {
+		error = "Exit error!";
+		success = "Closing connection...";
+		socket.close();
+	}
+
 	public static void main(String[] args) {
-		
+
 		Logger logger = Logger.getLogger("JARVIS");
-		
+
 		if (args.length < 3 || args.length > 3) {
 			logger.log(Level.WARNING, "Wrong arguments! [USAGE: <srcType> <dstType> <imgPath>]");
 			System.exit(1);
@@ -127,10 +136,7 @@ public class ConversionRequest {
 			logger.log(Level.WARNING, "Wrong path! [INSERT VALID PATH]");
 			System.exit(4);
 		}
-		File srcPath;
-//		if(!args[2].endsWith(args[0])) srcPath = new File(inFolder, args[2].concat(".").concat(args[0]));
-//		else 
-			srcPath = new File(inFolder, args[2]);
+		File srcPath = new File(inFolder, args[2]);
 		try {
 			if (!srcPath.getCanonicalFile().toPath().normalize().getParent().endsWith(Path.of(inFolder).normalize())) {
 				logger.log(Level.WARNING, "Wrong path! [INSERT VALID PATH]");
@@ -151,7 +157,8 @@ public class ConversionRequest {
 			client = new ConversionRequest();
 			logger.log(Level.INFO, client.success);
 			client.srcFilename = srcPath.getName();
-			File dstPath = new File(outFolder, client.srcFilename.split("\\.(?=[^\\.]+$)")[0].concat(String.format("%.6f",Math.random()*1000000)).concat(".").concat(dstType));
+			File dstPath = new File(outFolder, client.srcFilename.split("\\.(?=[^\\.]+$)")[0]
+					.concat(String.format("%.6f", Math.random() * 1000000)).concat(".").concat(dstType));
 			client.dstFilename = dstPath.getName();
 			toSendBuffer = client.readFile(srcPath);
 			logger.log(Level.INFO, client.success);
@@ -159,15 +166,21 @@ public class ConversionRequest {
 			logger.log(Level.INFO, client.success);
 			receivedBuffer = client.receiveData();
 			logger.log(Level.INFO, client.success);
+			client.closeConnection();
+			logger.log(Level.INFO, client.success);
 			client.writeFile(receivedBuffer, dstPath);
 			logger.log(Level.INFO, client.success);
 		} catch (Exception e) {
-			if(client !=null) {
-				logger.log(Level.SEVERE, client.error, e);
-					System.exit(6);
-				}else {
-			logger.log(Level.SEVERE, "Connection error!", e);
-			System.exit(7);
+			try {
+				if (client != null) {
+					logger.log(Level.SEVERE, client.error, e);
+					client.closeConnection();
+				} else
+					logger.log(Level.SEVERE, "Fatal connection error", e);
+			} catch (IOException e1) {
+				logger.log(Level.SEVERE, "Fatal connection error", e1);
+			} finally {
+				System.exit(6);
 			}
 		}
 	}
