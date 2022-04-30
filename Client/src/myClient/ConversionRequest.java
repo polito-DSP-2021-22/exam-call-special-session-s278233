@@ -1,13 +1,10 @@
 package myClient;
 
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.function.Supplier;
 import java.io.*;
-import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -131,9 +128,9 @@ public class ConversionRequest {
 			System.exit(4);
 		}
 		File srcPath;
-		if(!args[2].endsWith(args[0]))
-		 srcPath = new File(inFolder, args[2].concat(".").concat(args[0]));
-		else srcPath = new File(inFolder, args[2]);
+//		if(!args[2].endsWith(args[0])) srcPath = new File(inFolder, args[2].concat(".").concat(args[0]));
+//		else 
+			srcPath = new File(inFolder, args[2]);
 		try {
 			if (!srcPath.getCanonicalFile().toPath().normalize().getParent().endsWith(Path.of(inFolder).normalize())) {
 				logger.log(Level.WARNING, "Wrong path! [INSERT VALID PATH]");

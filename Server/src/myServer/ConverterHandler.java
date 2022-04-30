@@ -8,6 +8,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,7 @@ import javax.imageio.ImageIO;
 
 public class ConverterHandler implements Runnable {
 
-	private final static String supportedTypes[] = { "gif", "jpg", "png" };
+	private final static String supportedTypes[] = { "gif", "jpg", "jpeg", "png" };
 	private final static int blockSize = 65535;
 	private final static int TIMEOUT = 30 * 1000;
 	private DataOutputStream outputSocketStream = null;
@@ -47,7 +48,7 @@ public class ConverterHandler implements Runnable {
 		dstType = new String(type);
 		if (!Arrays.stream(supportedTypes).anyMatch(srcType::equals)
 				|| !Arrays.stream(supportedTypes).anyMatch(dstType::equals))
-			throw new IOException("Unsupported format");
+			throw new IOException("Unsupported format!");
 	}
 
 	private byte[] receiveFile() throws IOException {
@@ -75,7 +76,19 @@ public class ConverterHandler implements Runnable {
 	private byte[] convertFile(byte[] fileBuffer) throws IOException {
 		error = "Conversion error!";
 		success = "Converted file";
+		errorChar = '1';
+		
+		String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(fileBuffer));
+		String fileType = contentType.split("/")[0];
+		String imageType = contentType.split("/")[1];
+		
+		if(!fileType.equals("image")) throw new IOException("Not an image!");
+		if(srcType.equals("jpg")) {
+			if(!imageType.equals(srcType) && !imageType.equals("jpeg")) throw new IOException("Format mismatch!");
+		}else if(!imageType.equals(srcType)) throw new IOException("Format mismatch!");
+		
 		errorChar = '2';
+		
 		ByteArrayInputStream bais = new ByteArrayInputStream(fileBuffer);
 		BufferedImage loadedImage = ImageIO.read(bais);		
 		

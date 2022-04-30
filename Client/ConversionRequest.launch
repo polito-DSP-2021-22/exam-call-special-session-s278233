@@ -12,7 +12,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="myClient.ConversionRequest"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="Client"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="jpg png perù"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="jpg png perù.jpg"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Client"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.util.logging.config.file=&quot;./resources/logging.properties&quot;"/>
 </launchConfiguration>

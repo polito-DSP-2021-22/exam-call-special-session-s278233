@@ -7,8 +7,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
