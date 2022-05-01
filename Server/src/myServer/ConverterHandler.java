@@ -66,7 +66,7 @@ public class ConverterHandler implements Runnable {
 			while (bytesReadTotal < payloadLength) {
 				bytesRead = inputSocketStream.read(block, 0, payloadLength - bytesReadTotal);
 				if (bytesRead == -1)
-					throw new IOException("Read response error!");
+					throw new IOException("Read request error!");
 				baos.write(block, 0, bytesRead);
 				bytesReadTotal += bytesRead;
 			}

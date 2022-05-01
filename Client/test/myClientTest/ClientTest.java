@@ -280,11 +280,14 @@ class ClientTest {
 
 	@Test
 	final void testSendWrongData() {
+		System.setSecurityManager(new ExitDeniedSecurityManager());
+		String[] args = { "gif", "png", "perù.jpg" };
 		try {
-			test = new ConversionRequest();
-			assertThrows(Exception.class, () -> test.sendData(null, "jpg", "png"));
-		} catch (IOException e) {
-			e.printStackTrace();
+			ConversionRequest.main(args);
+			fail("Expected exit");
+		} catch (ExitSecurityException e) {
+			int status = e.getStatus();
+			assertEquals(6, status);
 		}
 	}
 
