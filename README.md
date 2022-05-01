@@ -30,6 +30,12 @@ The structure of this repository is the following:
   ```
   
 ###### Notes:
+  - i set the UTF-8 encoding for all classes and runnable to UTF-8 in order to avoid incompatibility between OSs, however if you try running ClientTest from Windows you could notice some errors because the name of a file written in the test contains characters with a different encoding. If it happens just do the following:
+  
+     - in Eclipse, in Window->Preferences->General->Content Types, set UTF-8 as the default encoding for all content types
+     
+     - in Eclipse, in Window->Preferences->General->Workspace, set Text file encoding to Other : UTF-8
+  	 
   - for testing and logging purposes arguments are specified in "ConversionRequest.launch" and "Converter.launch" files, respectively for client and server
   - if you want to start the client tests just Run as JUnit Test the class "ClientTest.java" in /test/myClientTest
   - if you want to change client arguments set the "org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value to "argument1 argument2 argument3 ..." in the "ConversionRequest.launch" file
