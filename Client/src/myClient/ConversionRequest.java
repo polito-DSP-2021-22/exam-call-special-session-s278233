@@ -56,7 +56,7 @@ public class ConversionRequest {
 		}
 
 		if (size == blockSize)
-			outputSocketStream.writeInt(0);
+			outputSocketStream.writeShort(0);
 
 		outputSocketStream.flush();
 		socket.shutdownOutput();
